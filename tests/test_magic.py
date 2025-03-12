@@ -938,6 +938,7 @@ def test_notebook_export_json_with_output():
 
     two_found, errors, display_output, stream_output = False, False, False, False
     for cell in nb["cells"]:
+        print("\nCell -> ", cell)
         for output in cell.get("outputs", []):
             if output["output_type"] == "error":
                 assert _ip.history_manager.exceptions[3]["ename"] in output["ename"]
