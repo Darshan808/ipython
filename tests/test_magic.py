@@ -922,7 +922,7 @@ def test_notebook_export_json_with_output():
     _ip = get_ipython()
     _ip.history_manager.reset()
     _ip.colors = "neutral"
-    _ip.execution_count = 0
+    _ip.execution_count = 1
 
     try:
         commands = [
