@@ -517,11 +517,12 @@ def test_pinfo_docstring_dynamic(capsys):
         Docstring for prop
         '''
         return self._prop
-    
+
     @prop.setter
     def prop(self, v):
         self._prop = v
     """
+    ip.disable_capturing_tee = True
     ip.run_cell(obj_def)
 
     ip.run_cell("b = Bar()")
@@ -545,6 +546,7 @@ def test_pinfo_docstring_dynamic(capsys):
     ip.run_cell("b.undefined?")
     captured = capsys.readouterr()
     assert re.search(r"Type:\s+NoneType", captured.out)
+    ip.disable_capturing_tee = False
 
 
 def test_pinfo_magic():

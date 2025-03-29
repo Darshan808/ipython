@@ -132,7 +132,7 @@ class PasteTestCase(TestCase):
         >>> y = []
         >>> for i in x:
         ...     y.append(i**2)
-        ... 
+        ...
         """
         )
         self.assertEqual(ip.user_ns["x"], [1, 2, 3])
@@ -174,7 +174,7 @@ class PasteTestCase(TestCase):
             """\
         >> >>> def f(x):
         >> ...   return x+1
-        >> ... 
+        >> ...
         >> >>> zz = f(2.5)      """
         )
         self.assertEqual(ip.user_ns["zz"], 3.5)
@@ -188,10 +188,12 @@ class PasteTestCase(TestCase):
         a = 100
         b = 200"""
         try:
+            ip.disable_capturing_tee = True
             self.paste(code, "")
             out = w.getvalue()
         finally:
             sys.stdout.write = old_write
+            ip.disable_capturing_tee = False
         self.assertEqual(ip.user_ns["a"], 100)
         self.assertEqual(ip.user_ns["b"], 200)
         assert out == code + "\n## -- End pasted text --\n"

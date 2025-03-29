@@ -543,6 +543,12 @@ class InteractiveShell(SingletonConfigurable):
         help="Warn if running in a virtual environment with no IPython installed (so IPython from the global environment is used).",
     ).tag(config=True)
 
+    # Flag to disable the custom CapturingTee mechanism.
+    # Useful in test environments to use the standard capturing of stdout/stderr.
+    disable_capturing_tee = Bool(
+        False, help="Disable the custom CapturingTee output capturing"
+    ).tag(config=True)
+
     # TODO: this part of prompt management should be moved to the frontends.
     # Use custom TraitTypes that convert '0'->'' and '\\n'->'\n'
     separate_in = SeparateUnicode('\n').tag(config=True)
@@ -3040,15 +3046,20 @@ class InteractiveShell(SingletonConfigurable):
         result : :class:`ExecutionResult`
         """
         result = None
-        tee_out = CapturingTee(self, channel="stdout")
-        tee_err = CapturingTee(self, channel="stderr")
+        tee_out = None
+        tee_err = None
+        if not self.disable_capturing_tee:
+            tee_out = CapturingTee(self, channel="stdout")
+            tee_err = CapturingTee(self, channel="stderr")
         try:
             result = self._run_cell(
                 raw_cell, store_history, silent, shell_futures, cell_id
             )
         finally:
-            tee_out.close()
-            tee_err.close()
+            if tee_out is not None:
+                tee_out.close()
+            if tee_err is not None:
+                tee_err.close()
             self.events.trigger('post_execute')
             if not silent:
                 self.events.trigger('post_run_cell', result)
