@@ -189,7 +189,6 @@ class PasteTestCase(TestCase):
         b = 200"""
         try:
             # ip.disable_capturing_tee = True
-            ip.colors = "nocolor"
             self.paste(code, "")
             out = w.getvalue()
         finally:

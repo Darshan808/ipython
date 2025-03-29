@@ -523,7 +523,6 @@ def test_pinfo_docstring_dynamic(capsys):
         self._prop = v
     """
     # ip.disable_capturing_tee = True
-    ip.colors = "nocolor"
     ip.run_cell(obj_def)
 
     ip.run_cell("b = Bar()")
