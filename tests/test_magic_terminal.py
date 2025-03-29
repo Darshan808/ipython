@@ -188,12 +188,13 @@ class PasteTestCase(TestCase):
         a = 100
         b = 200"""
         try:
-            ip.disable_capturing_tee = True
+            # ip.disable_capturing_tee = True
+            ip.colors = "nocolor"
             self.paste(code, "")
             out = w.getvalue()
         finally:
             sys.stdout.write = old_write
-            ip.disable_capturing_tee = False
+            # ip.disable_capturing_tee = False
         self.assertEqual(ip.user_ns["a"], 100)
         self.assertEqual(ip.user_ns["b"], 200)
         assert out == code + "\n## -- End pasted text --\n"
