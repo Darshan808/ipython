@@ -960,6 +960,13 @@ def test_notebook_export_json_with_output():
             sleep(2)
             actual_nb = nbformat.read(outfile, as_version=4)
 
+            # Read the outfile as a JSON file and print it
+            import json
+
+            with open(outfile, "r", encoding="utf-8") as json_file:
+                json_data = json.load(json_file)
+                print(json.dumps(json_data, indent=4))
+
         assert len(actual_nb["cells"]) == len(commands)
         assert len(expected_nb["cells"]) == len(commands)
 
