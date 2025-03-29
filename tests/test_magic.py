@@ -937,6 +937,9 @@ def test_notebook_export_json_with_output():
             cells=[nbformat.v4.new_code_cell(source=cmd) for cmd in commands]
         )
 
+        for cmd in commands:
+            _ip.run_cell(cmd, store_history=True, silent=False)
+            print(f"\n{_ip.history_manager.outputs}\n")
         with TemporaryDirectory() as td:
             outfile = os.path.join(td, "nb.ipynb")
             client = NotebookClient(
@@ -950,9 +953,6 @@ def test_notebook_export_json_with_output():
             nbformat.write(clean_nb, outfile)
             expected_nb = nbformat.read(outfile, as_version=4)
 
-        for cmd in commands:
-            _ip.run_cell(cmd, store_history=True, silent=False)
-            print(f"\n{_ip.history_manager.outputs}\n")
 
         with TemporaryDirectory() as td:
             outfile = os.path.join(td, "nb.ipynb")
