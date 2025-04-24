@@ -914,6 +914,48 @@ def test_notebook_export_json():
         _ip.run_line_magic("notebook", "%s" % outfile)
 
 
+def test_notebook_export_json_with_output():
+    """Tests if notebook export correctly captures outputs, errors, display outputs, and stream outputs."""
+    pytest.importorskip("nbformat")
+    import nbformat
+    _ip = get_ipython()
+    _ip.history_manager.reset()
+
+    cmds = [
+        "display('test')",
+        "1+1",
+        "1/0",
+        "print('test')",
+        "1",
+    ]  # Last cmd isn't stored in history
+    for cmd in cmds:
+        _ip.run_cell(cmd, store_history=True)
+
+    with TemporaryDirectory() as td:
+        outfile = os.path.join(td, "nb.ipynb")
+        _ip.run_line_magic("notebook", outfile)
+        nb = nbformat.read(outfile, as_version=4)
+
+    two_found, errors, display_output, stream_output = False, False, False, False
+    for cell in nb["cells"]:
+        print("\nCell -> ", cell)
+        for output in cell.get("outputs", []):
+            if output["output_type"] == "error":
+                assert _ip.history_manager.exceptions[3]["ename"] in output["ename"]
+                errors = True
+            elif output["output_type"] in ("execute_result", "display_data"):
+                if output["data"].get("text/plain") == "2":
+                    two_found = True
+                elif output["data"].get("text/plain") == "'test'":
+                    display_output = True
+            elif output["output_type"] == "stream" and output.get("text") == ["test\n"]:
+                stream_output = True
+
+    assert two_found, "Expected output '2' missing"
+    assert errors, "Expected error output missing"
+    assert display_output, "Expected display output missing"
+    assert stream_output, "Expected print output missing"
+
 class TestEnv(TestCase):
 
     def test_env(self):
